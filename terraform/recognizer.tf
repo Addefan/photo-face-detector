@@ -14,6 +14,9 @@ resource "yandex_function" "recognizer" {
     TELEGRAM_BOT_TOKEN = var.tg_bot_key
     FOLDER_ID          = var.folder_id
     MOUNT_POINT        = yandex_storage_bucket.photos_bucket.bucket
+    QUEUE_URL          = yandex_message_queue.crop_tasks_queue.id
+    ACCESS_KEY_ID      = yandex_iam_service_account_static_access_key.sa_recognizer_static_key.access_key
+    SECRET_ACCESS_KEY  = yandex_iam_service_account_static_access_key.sa_recognizer_static_key.secret_key
   }
   content {
     zip_filename = data.archive_file.recognizer_source.output_path
@@ -41,6 +44,12 @@ resource "yandex_function_trigger" "photos_bucket_trigger" {
   }
 }
 
+resource "yandex_message_queue" "crop_tasks_queue" {
+  name       = "vvot26-task"
+  access_key = yandex_iam_service_account_static_access_key.sa_recognizer_static_key.access_key
+  secret_key = yandex_iam_service_account_static_access_key.sa_recognizer_static_key.secret_key
+}
+
 data "archive_file" "recognizer_source" {
   type        = "zip"
   source_dir  = "../src/recognizer"
@@ -61,4 +70,14 @@ resource "yandex_resourcemanager_folder_iam_member" "sa_recognizer_storage_viewe
   folder_id = var.folder_id
   role      = "storage.viewer"
   member    = "serviceAccount:${yandex_iam_service_account.sa_recognizer.id}"
+}
+
+resource "yandex_resourcemanager_folder_iam_member" "sa_recognizer_ymq_editor_iam" {
+  folder_id = var.folder_id
+  role      = "ymq.writer"
+  member    = "serviceAccount:${yandex_iam_service_account.sa_recognizer.id}"
+}
+
+resource "yandex_iam_service_account_static_access_key" "sa_recognizer_static_key" {
+  service_account_id = yandex_iam_service_account.sa_recognizer.id
 }
