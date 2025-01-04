@@ -1,0 +1,4 @@
+from os import getenv
+
+PHOTOS_MOUNT_POINT = getenv("PHOTOS_MOUNT_POINT")
+FACES_MOUNT_POINT = getenv("FACES_MOUNT_POINT")
