@@ -8,11 +8,8 @@ resource "yandex_function" "recognizer" {
   memory             = "128"
   runtime            = "python312"
   user_hash          = data.archive_file.recognizer_source.output_sha512
-  execution_timeout  = "30"
   service_account_id = yandex_iam_service_account.sa_recognizer.id
   environment = {
-    TELEGRAM_BOT_TOKEN = var.tg_bot_key
-    FOLDER_ID          = var.folder_id
     MOUNT_POINT        = yandex_storage_bucket.photos_bucket.bucket
     QUEUE_URL          = yandex_message_queue.crop_tasks_queue.id
     ACCESS_KEY_ID      = yandex_iam_service_account_static_access_key.sa_recognizer_static_key.access_key
@@ -72,7 +69,7 @@ resource "yandex_resourcemanager_folder_iam_member" "sa_recognizer_storage_viewe
   member    = "serviceAccount:${yandex_iam_service_account.sa_recognizer.id}"
 }
 
-resource "yandex_resourcemanager_folder_iam_member" "sa_recognizer_ymq_editor_iam" {
+resource "yandex_resourcemanager_folder_iam_member" "sa_recognizer_ymq_writer_iam" {
   folder_id = var.folder_id
   role      = "ymq.writer"
   member    = "serviceAccount:${yandex_iam_service_account.sa_recognizer.id}"
