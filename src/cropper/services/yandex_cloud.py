@@ -1,16 +1,12 @@
-import uuid
-from pathlib import Path
-
+import piexif
 from PIL import Image
 
-from settings import PHOTOS_MOUNT_POINT, FACES_MOUNT_POINT
 
-
-def get_image(object_key):
-    with Image.open(Path("/function/storage", PHOTOS_MOUNT_POINT, object_key)) as image:
+def get_image(image_path):
+    with Image.open(image_path) as image:
         image.load()
     return image
 
 
-def save_image(image):
-    image.save(Path("/function/storage", FACES_MOUNT_POINT, f"{uuid.uuid4()}.jpg"))
+def save_image(image, image_path, exif=()):
+    image.save(image_path, exif=piexif.dump(exif))
