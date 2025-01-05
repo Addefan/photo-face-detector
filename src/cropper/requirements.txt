@@ -1,2 +1,4 @@
 pillow
 piexif
+requests
+requests_aws4auth
