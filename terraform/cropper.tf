@@ -12,6 +12,8 @@ resource "yandex_function" "cropper" {
   environment = {
     PHOTOS_MOUNT_POINT = yandex_storage_bucket.photos_bucket.bucket
     FACES_MOUNT_POINT  = yandex_storage_bucket.faces_bucket.bucket
+    ACCESS_KEY_ID      = yandex_iam_service_account_static_access_key.sa_cropper_static_key.access_key
+    SECRET_ACCESS_KEY  = yandex_iam_service_account_static_access_key.sa_cropper_static_key.secret_key
   }
   content {
     zip_filename = data.archive_file.cropper_source.output_path
@@ -72,4 +74,8 @@ resource "yandex_resourcemanager_folder_iam_member" "sa_cropper_ymq_reader_iam" 
   folder_id = var.folder_id
   role      = "ymq.reader"
   member    = "serviceAccount:${yandex_iam_service_account.sa_cropper.id}"
+}
+
+resource "yandex_iam_service_account_static_access_key" "sa_cropper_static_key" {
+  service_account_id = yandex_iam_service_account.sa_cropper.id
 }
