@@ -15,3 +15,17 @@ def send_message(reply_text, input_message):
     }
 
     requests.post(url=url, json=data)
+
+
+def send_photo(photo_url, input_message):
+    url = f"{TELEGRAM_API_URL}/sendPhoto"
+
+    data = {
+        "chat_id": input_message["chat"]["id"],
+        "photo": photo_url,
+        "reply_parameters": {
+            "message_id": input_message["message_id"],
+        },
+    }
+
+    requests.post(url=url, json=data)
