@@ -1,8 +1,9 @@
 import json
 
+from services.images import (set_tg_file_unique_id, set_name, rewrite_metadata,
+                             get_face_without_name, get_face_by_tg_file_unique_id)
 from services.telegram import send_message, send_photo
-from services.yandex_cloud import get_face_without_name
-from settings import API_GATEWAY_URL
+from settings import API_GATEWAY_URL, FACES_MOUNT_POINT
 
 
 def handle_message(message):
@@ -15,7 +16,16 @@ def handle_message(message):
             send_message("Нет лиц с незаданным именем", message)
             return
 
-        send_photo(f"{API_GATEWAY_URL}?face={object_key}", message)
+        file_unique_id = send_photo(f"{API_GATEWAY_URL}?face={object_key}", message)
+        rewrite_metadata(FACES_MOUNT_POINT, object_key, set_tg_file_unique_id, file_unique_id)
+
+    elif (text := message.get("text")) and (reply_message := message.get("reply_to_message", {})):
+        file_unique_id = reply_message.get("photo", [{}])[-1].get("file_unique_id")
+        if not file_unique_id:
+            return
+
+        object_key = get_face_by_tg_file_unique_id(file_unique_id)
+        rewrite_metadata(FACES_MOUNT_POINT, object_key, set_name, text)
 
     else:
         send_message("Ошибка", message)

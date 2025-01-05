@@ -1,15 +1,12 @@
-from pathlib import Path
-
+import piexif
 from PIL import Image
-from services.images import get_name
-
-from settings import FACES_MOUNT_POINT
 
 
-def get_face_without_name():
-    for image_path in Path("/function/storage", FACES_MOUNT_POINT).iterdir():
-        with Image.open(image_path) as image:
-            image.load()
+def get_image(image_path):
+    with Image.open(image_path) as image:
+        image.load()
+    return image
 
-        if not get_name(image):
-            return image_path.name
+
+def save_image(image, image_path, exif=()):
+    image.save(image_path, exif=piexif.dump(exif))

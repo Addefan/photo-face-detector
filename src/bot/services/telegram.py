@@ -28,4 +28,6 @@ def send_photo(photo_url, input_message):
         },
     }
 
-    requests.post(url=url, json=data)
+    response = requests.post(url=url, json=data)
+
+    return response.json()["result"]["photo"][-1]["file_unique_id"]
