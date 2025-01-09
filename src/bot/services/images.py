@@ -77,3 +77,16 @@ def get_face_by_tg_file_unique_id(file_unique_id):
 
         if get_tg_file_unique_id(image) == file_unique_id:
             return image_path.name
+
+
+def get_originals_by_name(name):
+    originals = []
+
+    for image_path in Path("/function/storage", FACES_MOUNT_POINT).iterdir():
+        with Image.open(image_path) as image:
+            image.load()
+
+        if get_name(image) == name:
+            originals.append(get_original_path(image))
+
+    return originals
