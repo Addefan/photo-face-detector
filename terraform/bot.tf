@@ -1,5 +1,5 @@
 resource "yandex_function" "bot" {
-  name               = "vvot26-boot"
+  name               = var.bot_function
   entrypoint         = "index.handler"
   memory             = "128"
   runtime            = "python312"
@@ -43,7 +43,7 @@ resource "telegram_bot_webhook" "exam_solver_tg_bot_webhook" {
 }
 
 resource "yandex_api_gateway" "api_gw" {
-  name = "vvot26-apigw"
+  name = var.api_gateway
   spec = <<-EOT
 openapi: "3.0.0"
 info:
@@ -74,7 +74,7 @@ data "archive_file" "bot_source" {
 }
 
 resource "yandex_iam_service_account" "sa_bot" {
-  name = "sa-bot"
+  name = var.sa_bot
 }
 
 resource "yandex_resourcemanager_folder_iam_member" "sa_bot_storage_editor_iam" {

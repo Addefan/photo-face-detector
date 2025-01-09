@@ -1,9 +1,9 @@
 resource "yandex_storage_bucket" "faces_bucket" {
-  bucket = "vvot26-faces"
+  bucket = var.faces_bucket
 }
 
 resource "yandex_function" "cropper" {
-  name               = "vvot26-face-cut"
+  name               = var.face_cut_function
   entrypoint         = "index.handler"
   memory             = "128"
   runtime            = "python312"
@@ -35,7 +35,7 @@ resource "yandex_function" "cropper" {
 }
 
 resource "yandex_function_trigger" "crop_tasks_queue_trigger" {
-  name = "vvot26-task"
+  name = var.face_cut_trigger
   function {
     id                 = yandex_function.cropper.id
     service_account_id = yandex_iam_service_account.sa_cropper.id
@@ -55,7 +55,7 @@ data "archive_file" "cropper_source" {
 }
 
 resource "yandex_iam_service_account" "sa_cropper" {
-  name = "sa-cropper"
+  name = var.sa_face_cut
 }
 
 resource "yandex_resourcemanager_folder_iam_member" "sa_cropper_function_invoker_role" {
